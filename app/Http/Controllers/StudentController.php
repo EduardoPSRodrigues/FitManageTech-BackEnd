@@ -14,6 +14,21 @@ class StudentController extends Controller
     public function index(Request $request)
     {
 
+        $user_id = Auth::user()->id;
+
+        $search = $request->input('search');
+
+        $students = Student::query()
+            ->where('user_id', $user_id)
+            ->where(function ($query) use ($search) {
+                $query->where('name', 'ilike', "%$search%")
+                    ->orWhere('cpf', 'ilike', "%$search%")
+                    ->orWhere('email', 'ilike', "%$search%");
+            })
+            ->orderBy('name')
+            ->get();
+
+        return $students;
     }
 
     public function store(Request $request)
