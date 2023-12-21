@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Exercise;
-use App\Models\Plan;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,5 +57,25 @@ class StudentController extends Controller
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
+    }
+
+    public function destroy($id)
+    {
+
+        $user_id = Auth::user()->id;
+
+        $student = Student::find($id);
+
+        if (!$student) {
+            return $this->error('O estudante não está cadastrado no banco de dados.', Response::HTTP_NOT_FOUND);
+        }
+
+        if ($student->user_id !== $user_id) {
+            return $this->error('O usuário não pode deletar esse estudante.', Response::HTTP_FORBIDDEN);
+        }
+
+        $student->delete();
+
+        return $this->response('', Response::HTTP_NO_CONTENT);
     }
 }

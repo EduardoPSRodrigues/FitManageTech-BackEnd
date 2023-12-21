@@ -9,7 +9,6 @@ use App\Http\Middleware\ValidateLimitStudentsToUser;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
-    // rotas privadas
 
     Route::get('dashboard', [DashboardController::class, 'index']);
 
@@ -19,10 +18,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('students', [StudentController::class, 'index']);
     Route::post('students', [StudentController::class, 'store'])->middleware(ValidateLimitStudentsToUser::class);
+    Route::delete('students/{id}', [StudentController::class, 'destroy']);
 
 });
-
-// rota pública
 
 Route::post('login', [AuthController::class, 'store']);
 Route::post('users', [UserController::class, 'store']);
