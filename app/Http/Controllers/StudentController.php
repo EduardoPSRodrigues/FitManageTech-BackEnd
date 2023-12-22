@@ -59,6 +59,44 @@ class StudentController extends Controller
         }
     }
 
+    public function update($id, Request $request)
+    {
+        try {
+            $user_id = Auth::user()->id;
+
+            $data = $request->all();
+
+            $request->validate([
+                'name' => 'string|max:255',
+                'email' => 'string|email|max:255|unique:students',
+                'date_birth' => 'date_format:Y-m-d',
+                'cpf' => 'string|min:11|max:14|regex:/^\d{3}\.\d{3}\.\d{3}-\d{2}$/|unique:students',
+                'contact' => 'string|max:20',
+                'city' => 'string|max:50|nullable',
+                'neighborhood' => 'string|max:50|nullable',
+                'number' => 'string|max:30|nullable',
+                'street' => 'string|max:30|nullable',
+                'state' => 'string|max:2|nullable',
+                'cep' => 'string|max:20|nullable',
+            ]);
+
+            $student = Student::where('id', $id)
+                ->where('user_id', $user_id)
+                ->first();
+
+            if (!$student) {
+                return $this->error('Falha em atualizar: O usuário não tem permissão ou o estudante não está cadastrado no banco de dados.',
+                Response::HTTP_NOT_FOUND);
+            }
+
+            $student->update($data);
+
+            return $student;
+        } catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+    }
+
     public function destroy($id)
     {
 
