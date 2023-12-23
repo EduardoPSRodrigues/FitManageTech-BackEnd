@@ -14,48 +14,35 @@ class WorkoutController extends Controller
 {
     public function index(Request $request)
     {
-        try {
+        $user_id = Auth::user()->id;
+        $student_id = $request->input('student_id');
 
-            $user_id = Auth::user()->id;
+        $student = Student::where('user_id', $user_id)->find($student_id);
 
-            $data = $request->all();
+        if ($student) {
 
-            $request->validate([
-                'student_id' => 'integer|required',
-                'exercise_id' => 'integer|required',
-                'repetitions' => 'integer|required',
-                'weight' => 'numeric|required',
-                'break_time' => 'integer|required',
-                'day' => [
-                    Rule::in(['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA', 'SÁBADO', 'DOMINGO']),
-                ],
-                'observations' => 'string|nullable',
-                'time' => 'integer|required',
-            ]);
+            $workout = Workout::where('student_id', $student_id)->orderBy('created_at')->get();
 
-            $existingStudent = Student::where('user_id', $user_id)->first();
+            $groupedDays = [];
 
-            if (!$existingStudent) {
-                return $this->error('O usuário não tem permissão para cadastrar um treino para esse aluno.', Response::HTTP_CONFLICT);
+            foreach ($workout as $data) {
+                $day = $data['day'];
+                if (!isset($groupedDays[$day])) {
+                    $groupedDays[$day] = [];
+                }
+                $groupedDays[$day][] = $data;
             }
 
-            if ($user_id !== $existingStudent->user_id) {
-                return $this->error('O usuário não tem permissão para cadastrar um treino para esse aluno.', Response::HTTP_CONFLICT);
-            }
-
-            $existingWorkoutDay = Workout::where('day', $data['day'])
-                ->where('exercise_id', $data['exercise_id'])
-                ->first();
-
-            if ($existingWorkoutDay) {
-                return $this->error('O treino já está cadastrado para este dia.', Response::HTTP_CONFLICT);
-            }
-
-            $exercise = Workout::create($data);
-
-            return $exercise;
-        } catch (\Exception $exception) {
-            return $this->error($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+            return [
+                'student_id' => $student_id,
+                'student_name' => $student->name,
+                'workouts' => $groupedDays,
+            ];
+        } else {
+            return $this->error(
+                'O usuário não tem permissão para visualizar essas informações.',
+                Response::HTTP_FORBIDDEN
+            );
         }
     }
 
