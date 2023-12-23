@@ -23,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('students/{id}', [StudentController::class, 'destroy']);
 
     Route::post('workouts', [WorkoutController::class, 'store']);
+    Route::get('students/workouts', [WorkoutController::class, 'index']);
 
 });
 
