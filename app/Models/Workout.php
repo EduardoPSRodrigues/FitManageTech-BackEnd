@@ -22,6 +22,6 @@ class Workout extends Model
         'time',
     ];
 
-    protected $hidden = ['updated_at', 'created_at'];
+    protected $hidden = ['updated_at', 'created_at', 'id', 'student_id', 'day'];
 
 }
