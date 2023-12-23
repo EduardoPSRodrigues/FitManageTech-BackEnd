@@ -29,6 +29,15 @@ class StudentController extends Controller
         return $students;
     }
 
+    public function show($id)
+    {
+        $student = Student::find($id);
+
+        if (!$student) return $this->error('O estudante não foi encontrado.', Response::HTTP_NOT_FOUND);
+
+        return $student;
+    }
+
     public function store(Request $request)
     {
         try {
