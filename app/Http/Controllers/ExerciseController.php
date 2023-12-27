@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exercise;
-use App\Models\Plan;
-use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,20 +55,24 @@ class ExerciseController extends Controller
     public function destroy($id)
     {
 
-        $user_id = Auth::user()->id;
+        try {
+            $user_id = Auth::user()->id;
 
-        $exercise = Exercise::find($id);
+            $exercise = Exercise::find($id);
 
-        if (!$exercise) {
-            return $this->error('Exercício não encontrado no banco de dados.', Response::HTTP_NOT_FOUND);
+            if (!$exercise) {
+                return $this->error('Exercício não encontrado no banco de dados.', Response::HTTP_NOT_FOUND);
+            }
+
+            if ($exercise->user_id !== $user_id) {
+                return $this->error('O usuário não pode deletar esse exercício.', Response::HTTP_FORBIDDEN);
+            }
+
+            $exercise->delete();
+
+            return $this->response('', Response::HTTP_NO_CONTENT);
+        } catch (\Exception $exception) {
+            return $this->error('Não é permitido deletar o exercício, pois está vinculado a um treino.', Response::HTTP_CONFLICT);
         }
-
-        if ($exercise->user_id !== $user_id) {
-            return $this->error('O usuário não pode deletar esse exercício.', Response::HTTP_FORBIDDEN);
-        }
-
-        $exercise->delete();
-
-        return $this->response('', Response::HTTP_NO_CONTENT);
     }
 }
