@@ -11,22 +11,25 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
+        try {
+            $user_id = Auth::user()->id;
 
-        $user_id = Auth::user()->id;
+            $search = $request->input('search');
 
-        $search = $request->input('search');
+            $students = Student::query()
+                ->where('user_id', $user_id)
+                ->where(function ($query) use ($search) {
+                    $query->where('name', 'ilike', "%$search%")
+                        ->orWhere('cpf', 'ilike', "%$search%")
+                        ->orWhere('email', 'ilike', "%$search%");
+                })
+                ->orderBy('name')
+                ->get();
 
-        $students = Student::query()
-            ->where('user_id', $user_id)
-            ->where(function ($query) use ($search) {
-                $query->where('name', 'ilike', "%$search%")
-                    ->orWhere('cpf', 'ilike', "%$search%")
-                    ->orWhere('email', 'ilike', "%$search%");
-            })
-            ->orderBy('name')
-            ->get();
-
-        return $students;
+            return $students;
+        } catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
     }
 
     public function show($id)
@@ -94,8 +97,10 @@ class StudentController extends Controller
                 ->first();
 
             if (!$student) {
-                return $this->error('Falha em atualizar: O usuário não tem permissão ou o estudante não está cadastrado no banco de dados.',
-                Response::HTTP_NOT_FOUND);
+                return $this->error(
+                    'Falha em atualizar: O usuário não tem permissão ou o estudante não está cadastrado no banco de dados.',
+                    Response::HTTP_NOT_FOUND
+                );
             }
 
             $student->update($data);

@@ -14,35 +14,47 @@ class WorkoutController extends Controller
 {
     public function index(Request $request)
     {
-        $user_id = Auth::user()->id;
-        $student_id = $request->input('student_id');
+        try {
+            $user_id = Auth::user()->id;
+            $student_id = $request->input('student_id');
 
-        $student = Student::where('user_id', $user_id)->find($student_id);
+            $student = Student::where('user_id', $user_id)->find($student_id);
 
-        if ($student) {
+            if ($student) {
 
-            $workout = Workout::where('student_id', $student_id)->orderBy('created_at')->get();
+                $workout = Workout::where('student_id', $student_id)->orderBy('created_at')->get();
 
-            $groupedDays = [];
+                $groupedDays = [];
 
-            foreach ($workout as $data) {
-                $day = $data['day'];
-                if (!isset($groupedDays[$day])) {
-                    $groupedDays[$day] = [];
+                foreach ($workout as $data) {
+                    $day = $data['day'];
+                    $exerciseId = $data['exercise_id'];
+
+                    $exercise = Exercise::find($exerciseId);
+
+                    if (!isset($groupedDays[$day])) {
+                        $groupedDays[$day] = [];
+                    }
+
+                    $groupedDays[$day][] = [
+                        'workout_details' => $data,
+                        'exercise_details' => $exercise,
+                    ];
                 }
-                $groupedDays[$day][] = $data;
-            }
 
-            return [
-                'student_id' => $student_id,
-                'student_name' => $student->name,
-                'workouts' => $groupedDays,
-            ];
-        } else {
-            return $this->error(
-                'O usuário não tem permissão para visualizar essas informações.',
-                Response::HTTP_FORBIDDEN
-            );
+                return [
+                    'student_id' => $student_id,
+                    'student_name' => $student->name,
+                    'workouts' => $groupedDays,
+                ];
+            } else {
+                return $this->error(
+                    'O usuário não tem permissão para visualizar essas informações.',
+                    Response::HTTP_FORBIDDEN
+                );
+            }
+        } catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
 
