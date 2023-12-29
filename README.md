@@ -1,4 +1,6 @@
-![FITNESSE MANAGE TECH](https://github.com/EduardoPSRodrigues/FitManageTech-BackEnd/assets/135388215/2cc28446-6e31-4f5b-ac2c-4c18f0b326f6)
+<div align="center">
+<img src="public/Ola.png" width="900px" alt="Ola" />
+</div>
 
 <p align="center">
 <a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
@@ -115,9 +117,9 @@ docker run --name academia -e POSTGRESQL_USERNAME=admin -e POSTGRESQL_PASSWORD=a
 php artisan migrate
 ```
 
-## 💻 DEMONSTRAÇÃO DA API 
+## ✳️ DEMONSTRAÇÃO DA API 
 
-#### S01 - Cadastro de Usuário
+#### S01 - Cadastro de Usuário - Rota Pública
 
 ```http
   POST http://127.0.0.1:8000/api/users
@@ -132,7 +134,7 @@ php artisan migrate
 | password | string | Senha com mínimo de 8 caracteres, máximo de 32 caracteres e obrigatório. |
 | plan_id | integer | Tipo de plano do usuário (Bronze: 1, Prata: 2, Outro: 3 |
 
-Request JSON exemplo
+JSON Content
 ```http
   {
   "name": "Eduardo Phelipe",
@@ -144,7 +146,113 @@ Request JSON exemplo
 ```
 
 | Response Status       | Descrição                           |
-|  :--------- | :---------------------------------- |
+|  --------- | ---------------------------------- |
 |  201 | Usuário criado com sucesso |
 |  400 | Falha ao cadastrar. Dados inválidos|
+
+#### Após realizar o cadastro do usuário, o mesmo recebe um e-mail de boas vindas especificando o tipo de plano e o limite de cadastro de estudantes.
+
+<div align="center">
+<img src="public/Email de Boas Vindas.png" width="700px" alt="1email de boas-vindas" />
+</div>
+
+##
+#### S02 - Login - Rota Pública
+
+```http
+  POST http://127.0.0.1:8000/api/login
+```
+
+| Parâmetro  | Tipo      | Descrição                          |
+| ---------- | --------- | ---------------------------------- |
+| email | string | E-mail do usuário válido e obrigatório. |
+| password | string | Senha obrigatória. |
+
+
+JSON Content
+```http
+{
+"email": "eduardo@teste.com",
+"password": "12345678"
+}
+```
+
+JSON Response
+```http
+{
+  "message": "Autorizado",
+  "status": 200,
+  "data": {
+    "name": "Eduardo Phelipe",
+    "token": "62|n7112mmyFI7aV5bfKNwpO1zGkysWOQK2Bd1TN68g0f420033"
+  }
+}
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Usuário logado com sucesso |
+|  401 | Não autorizado. Credenciais incorretas|
+
+#### A partir desse momento se faz necessário o uso do token em todas as rotas, pois as rotas são privadas. Vale ressaltar que o token tem validade de 24 horas.
+
+##
+#### S03 - Dashboard - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+À medida que o usuário cadastra exercícios e estudantes, o sistema atualiza o Dashboard e impede o registro de novos estudantes se o limite do plano for atingido.
+
+```http
+  GET http://127.0.0.1:8000/api/dashboard
+```
+
+JSON Response
+```http
+{
+  "registered_students": 0,
+  "registered_exercises": 0,
+  "current_user_plan": "PLANO PRATA",
+  "remaining_students": 20
+}
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Dados do dashboard |
+|  401 | Não autorizado.|
+
+##
+#### S04 - Cadastro de exercícios - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  POST http://127.0.0.1:8000/api/exercises
+```
+
+| Parâmetro  | Tipo      | Descrição                          |
+| ---------- | --------- | ---------------------------------- |
+| description | string | O exercício é obrigatório e possui o máximo de 255 caracteres |
+
+JSON Content
+```http
+{
+"description": "Supino"
+}
+```
+
+JSON Response
+```http
+{
+  "description": "Supino",
+  "id": 30
+}
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  201 | Exercício criado com sucesso |
+|  409 | Conflito. O exercício já existe para este usuário.|
+
 
