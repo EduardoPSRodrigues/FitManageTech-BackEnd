@@ -136,7 +136,7 @@ php artisan migrate
 
 JSON Content
 ```http
-  {
+{
   "name": "Eduardo Phelipe",
   "email": "eduardo@teste.com",
   "date_birth": "1990-01-16",
@@ -153,7 +153,7 @@ JSON Content
 #### Após realizar o cadastro do usuário, o mesmo recebe um e-mail de boas vindas especificando o tipo de plano e o limite de cadastro de estudantes.
 
 <div align="center">
-<img src="public/Email de Boas Vindas.png" width="700px" alt="1email de boas-vindas" />
+<img src="public/Email de Boas Vindas.png" width="700px" alt="Email de boas-vindas" />
 </div>
 
 ##
@@ -252,7 +252,433 @@ JSON Response
 
 | Response Status       | Descrição                           |
 |  --------- | ---------------------------------- |
-|  201 | Exercício criado com sucesso |
+|  201 | Exercício criado com sucesso. |
+|  400 | Falha ao cadastrar. Dados inválidos. |
 |  409 | Conflito. O exercício já existe para este usuário.|
+
+##
+#### S05 - Listagem de exercícios - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  GET http://127.0.0.1:8000/api/exercises
+```
+
+JSON Response
+```http
+[
+  {
+    "id": 32,
+    "description": "Abdominal"
+  },
+  {
+    "id": 31,
+    "description": "Flexão"
+  },
+  {
+    "id": 30,
+    "description": "Supino"
+  }
+]
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Resposta com os dados. |
+|  500 | Token inválido. |
+
+
+##
+#### S06 - Deleção de exercícios - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  DELETE http://127.0.0.1:8000/api/exercises/30
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  204 | Exercício deletado com sucesso. |
+|  403 | O usuário não pode deletar esse exercício. |
+|  404 | Exercício não encontrado no banco de dados. |
+|  409 | Conflito. Não é permitido deletar o exercício, pois está vinculado a um treino.|
+|  500 | Token inválido. |
+
+##
+#### S07 - Cadastro de estudante - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  POST http://127.0.0.1:8000/api/students
+```
+
+| Parâmetro  | Tipo      | Descrição                          |
+| ---------- | --------- | ---------------------------------- |
+| name | string | O nome é obrigatório e possui o máximo de 255 caracteres |
+| email | string | O e-mail é obrigatório, válido, único e possui o máximo de 255 caracteres |
+| date_birth | date | A data é obrigatória e no formato yyyy-mm-dd |
+| cpf | string | O CPF é obrigatório, mín:11, máx:14 caracteres e único |
+| contact | string | O contato é obrigatório e possui o máximo de 20 caracteres |
+| city | string | A cidade possui o máximo de 50 caracteres, é opcional e pode ser nulo |
+| neighborhood | string | O bairro possui o máximo de 50 caracteres, é opcional e pode ser nulo |
+| number | string | O número possui o máximo de 30 caracteres, é opcional e pode ser nulo |
+| street | string | A rua possui o máximo de 30 caracteres, é opcional e pode ser nulo |
+| state | string | O estado possui o máximo de 2 caracteres, é opcional e pode ser nulo |
+| cep | string | O cep possui o máximo de 20 caracteres, é opcional e pode ser nulo |
+
+
+JSON Content
+```http
+{
+    "name": "Henrique Douglas",
+    "email": "henrique@example.com",
+    "date_birth": "1996-02-22",
+    "cpf": "111.222.333-44",
+    "contact": "(78) 901-2345",
+    "cep": "98765-432",
+    "street": "Maple Avenue",
+    "state": "IL",
+    "neighborhood": "Downtown",
+    "city": "Chicago",
+    "number": "3839"
+}
+```
+
+JSON Response
+```http
+{
+  "name": "Henrique Douglas",
+  "email": "henrique@example.com",
+  "date_birth": "1996-02-22",
+  "cpf": "111.222.333-44",
+  "contact": "(78) 901-2345",
+  "cep": "98765-432",
+  "street": "Maple Avenue",
+  "state": "IL",
+  "neighborhood": "Downtown",
+  "city": "Chicago",
+  "number": "3839",
+  "id": 162
+}
+```
+
+#### Foi implementado um Middleware, com o nome ValidateLimitStudentsToUser, para fazer o controle do limite de cadastro dos estudantes de acordo com o plano do usuário.
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  201 | Estudante criado com sucesso. |
+|  400 | Falha ao cadastrar. Dados inválidos. |
+|  403 | Não é possível cadastrar um novo estudante, pois atingiu o limite do plano.|
+
+##
+#### S08 - Listagem de estudantes - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  GET http://127.0.0.1:8000/api/students?search
+```
+
+JSON Response
+```http
+[
+  {
+    "id": 163,
+    "name": "Afonso Padilha",
+    "email": "afonso@example.com",
+    "date_birth": "1996-02-22",
+    "cpf": "222.333.444-55",
+    "contact": "(11) 102-4526",
+    "city": "São Paulo",
+    "neighborhood": "Centro",
+    "number": "12",
+    "street": "Avenida Paulista Avenue",
+    "state": "SP",
+    "cep": "98765-432"
+  },
+  {
+    "id": 162,
+    "name": "Henrique Douglas",
+    "email": "henrique@example.com",
+    "date_birth": "1996-02-22",
+    "cpf": "111.222.333-44",
+    "contact": "(78) 901-2345",
+    "city": "Chicago",
+    "neighborhood": "Downtown",
+    "number": "3839",
+    "street": "Maple Avenue",
+    "state": "IL",
+    "cep": "98765-432"
+  }
+]
+```
+
+#### Ao utilizar o Query Parameters é possui filtrar o resultado através do nome, CPF ou e-mail do estudante.
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Resposta com os dados. |
+|  500 | Token inválido. |
+
+
+##
+#### S09 - Deleção de estudante - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  DELETE http://127.0.0.1:8000/api/students/163
+```
+
+#### Utiliza-se o Soft Delete para fazer a deleção do estudante.
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  204 | Estudante deletado com sucesso. |
+|  403 | O usuário não pode deletar esse estudante. |
+|  404 | O estudante não está cadastrado no banco de dados. |
+|  500 | Token inválido. |
+
+
+##
+#### S010 - Atualização de estudante - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  PUT http://127.0.0.1:8000/api/students/162
+```
+
+| Parâmetro  | Tipo      | Descrição                          |
+| ---------- | --------- | ---------------------------------- |
+| name | string | O nome possui o máximo de 255 caracteres e é opcional |
+| email | string | O e-mail é válido, único, possui o máximo de 255 caracteres e é opcional |
+| date_birth | date | A data possui o formato yyyy-mm-dd e é opcional |
+| cpf | string | O CPF possui o mín:11, máx:14 caracteres e único e é opcional |
+| contact | string | O contato possui o máximo de 20 caracteres e é opcional |
+| city | string | A cidade possui o máximo de 50 caracteres, é opcional e pode ser nulo |
+| neighborhood | string | O bairro possui o máximo de 50 caracteres, é opcional e pode ser nulo |
+| number | string | O número possui o máximo de 30 caracteres, é opcional e pode ser nulo |
+| street | string | A rua possui o máximo de 30 caracteres, é opcional e pode ser nulo |
+| state | string | O estado possui o máximo de 2 caracteres, é opcional e pode ser nulo |
+| cep | string | O cep possui o máximo de 20 caracteres, é opcional e pode ser nulo |
+
+
+JSON Content
+```http
+{
+ "name": "Henrique Douglas Pereira da Costa Neto"
+}
+```
+
+JSON Response
+```http
+{
+  "id": 162,
+  "name": "Henrique Douglas Pereira da Costa Neto",
+  "email": "henrique@example.com",
+  "date_birth": "1996-02-22",
+  "cpf": "111.222.333-44",
+  "contact": "(78) 901-2345",
+  "city": "Chicago",
+  "neighborhood": "Downtown",
+  "number": "3839",
+  "street": "Maple Avenue",
+  "state": "IL",
+  "cep": "98765-432"
+}
+```
+
+#### É possível atualizar todos ou apenas um campo do estudante.
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Estudante atualizado com sucesso. |
+|  404 | Falha em atualizar: O usuário não tem permissão ou o estudante não está cadastrado no banco de dados.|
+
+##
+#### S11 - Cadastro de treinos - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  POST http://127.0.0.1:8000/api/workouts
+```
+
+| Parâmetro  | Tipo      | Descrição                          |
+| ---------- | --------- | ---------------------------------- |
+| student_id | integer | O id do estudante é obrigatório |
+| exercise_id | integer |  O id do exercício é obrigatório |
+| repetitions | integer | A repetição é obrigatória |
+| weight | numeric | O peso é obrigatório |
+| break_time | integer | O tempo de pausa é obrigatório |
+| day | enum | O dia é obrigatório e as opções são: SEGUNDA, TERÇA, QUARTA, QUINTA, SEXTA, SÁBADO, DOMINGO |
+| observations | string | As observações são opcionais e pode ser nula |
+| time | integer | O tempo de execução é obrigatório |
+
+JSON Content
+```http
+{
+  "student_id": "162",
+  "exercise_id": "34",
+  "repetitions": "10",
+  "weight": "8",
+  "break_time": "2",
+  "day": "DOMINGO",
+  "observations": "Unilateral",
+  "time": "1"
+}
+```
+
+JSON Response
+```http
+{
+  "exercise_id": "34",
+  "repetitions": "10",
+  "weight": "8",
+  "break_time": "2",
+  "observations": "Unilateral",
+  "time": "1"
+}
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  201 | Treino criado com sucesso. |
+|  409 | O treino já está cadastrado para este dia. |
+|  409 | O usuário não tem permissão para cadastrar um treino para esse aluno ou o exercício é inválido. |
+|  500 | Token inválido. |
+
+##
+#### S12 - Listagem dos treinos do estudante - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  GET http://127.0.0.1:8000/api/students/workouts?student_id=162
+```
+
+#### Passar o student_id via Query Parameters.
+
+JSON Response
+```http
+{
+  "student_id": "162",
+  "student_name": "Henrique Douglas Pereira da Costa Neto",
+  "workouts": {
+    "SEGUNDA": [
+      {
+        "workout_details": {
+          "exercise_id": 31,
+          "repetitions": 10,
+          "weight": "2",
+          "break_time": 1,
+          "observations": null,
+          "time": 1
+        },
+        "exercise_details": {
+          "id": 31,
+          "description": "Flexão"
+        }
+      }
+    ],
+    "TERÇA": [
+      {
+        "workout_details": {
+          "exercise_id": 35,
+          "repetitions": 10,
+          "weight": "10",
+          "break_time": 1,
+          "observations": "Drop 7",
+          "time": 1
+        },
+        "exercise_details": {
+          "id": 35,
+          "description": "Halter"
+        }
+      }
+    ],
+    "QUARTA": [
+      {
+        "workout_details": {
+          "exercise_id": 35,
+          "repetitions": 10,
+          "weight": "10",
+          "break_time": 1,
+          "observations": "Drop 7",
+          "time": 1
+        },
+        "exercise_details": {
+          "id": 35,
+          "description": "Halter"
+        }
+      }
+    ]
+  }
+}
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Resposta com os dados. |
+|  403 | O usuário não tem permissão para visualizar essas informações. |
+|  401 | Não autenticado. |
+
+##
+#### S13 - Listagem dos dados do estudante - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  GET http://127.0.0.1:8000/api/students/162
+```
+
+JSON Response
+```http
+{
+  "id": 162,
+  "name": "Henrique Douglas Pereira da Costa Neto",
+  "email": "henrique@example.com",
+  "date_birth": "1996-02-22",
+  "cpf": "111.222.333-44",
+  "contact": "(78) 901-2345",
+  "city": "Chicago",
+  "neighborhood": "Downtown",
+  "number": "3839",
+  "street": "Maple Avenue",
+  "state": "IL",
+  "cep": "98765-432"
+}
+```
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Resposta com os dados. |
+|  404 | O estudante não foi encontrado. |
+|  500 | Token inválido. |
+
+##
+#### S14 - Exportação dos Treinos em PDF - Rota Privada
+
+Colar o token em Auth -> Bearer
+
+```http
+  GET http://127.0.0.1:8000/api/students/export?student_id=162
+```
+
+#### Ao utilizar a extensão vscode-pdf (autor: tomoki1207) será possível salvar ou visualizar o arquivo gerado.
+
+| Response Status       | Descrição                           |
+|  --------- | ---------------------------------- |
+|  200 | Resposta com os dados. |
+|  403 | O usuário não tem permissão para visualizar essas informações. |
+|  500 | Token inválido. |
+
+<div align="center">
+<img src="public/" width="700px" alt="Print do arquivo em PDF" />
+</div>
 
 
