@@ -11,7 +11,7 @@
 
 ## API FITNESS MANAGE TECH
 
-O FITNESS MANAGE TECH é uma aplicação baseada em uma API REST que integra-se ao banco de dados PostgreSQL. Foi desenvolvida para a gestão de usuários, possibilitando o acesso ao sistema por 24 horas; caso contrário, o token JWT é automaticamente revogado. Além disso, oferece funcionalidades como cadastro e listagem de exercícios, treinos e estudantes, além de recursos adicionais, como o envio de um e-mail de boas-vindas para novos usuários e a geração de um PDF contendo os treinos do estudante.
+O FITNESS MANAGE TECH é uma aplicação baseada em uma API REST que integra-se ao banco de dados PostgreSQL. Foi desenvolvida para a gestão de usuários, possibilitando o acesso ao sistema por 24 horas; caso contrário, o token JWT é automaticamente revogado. Além disso, oferece funcionalidades como cadastro e listagem de exercícios, treinos e estudantes, possui ainda a deleção de exercícios e de estudantes, vale ressaltar que a deleção de estudantes utiliza o Soft Delete. Além de recursos adicionais, como o envio de um e-mail de boas-vindas para novos usuários e a geração de um PDF contendo os treinos do estudante separado por dia.
 
 ## 💻 TECNOLOGIAS UTILIZADAS 
 
@@ -56,7 +56,7 @@ Dessa forma, o cronograma oferece uma representação visual e organizada das di
 | 26/12/2023 | Funcionalidade para realizar a exportação do treino em PDF. |
 | 27/12/2023 | Funcionalidade para enviar um e-mail de boas-vindas ao usuário cadastrado no sistema. |
 | 28/12/2023 | Formatação da documentação do Readme. |
-| 29/12/2023 | Preparação do vídeo de apresentação e envio do projeto no AVA.  |
+| 29/12/2023 | Finalização da documentação do Readme, preparação do vídeo de apresentação e envio do projeto no AVA.  |
 
 ## ▶️ COMO EXECUTAR O PROJETO
 
@@ -117,6 +117,12 @@ docker run --name academia -e POSTGRESQL_USERNAME=admin -e POSTGRESQL_PASSWORD=a
 php artisan migrate
 ```
 
+- Execute a Seed para popular o banco de dados com os tipos de planos.
+
+```
+php artisan db:seed PopulatePlans
+```
+
 ## ✳️ DEMONSTRAÇÃO DA API 
 
 #### S01 - Cadastro de Usuário - Rota Pública
@@ -146,7 +152,7 @@ JSON Content
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  201 | Usuário criado com sucesso |
 |  400 | Falha ao cadastrar. Dados inválidos|
 
@@ -190,7 +196,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Usuário logado com sucesso |
 |  401 | Não autorizado. Credenciais incorretas|
 
@@ -218,7 +224,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Dados do dashboard |
 |  401 | Não autorizado.|
 
@@ -251,7 +257,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  201 | Exercício criado com sucesso. |
 |  400 | Falha ao cadastrar. Dados inválidos. |
 |  409 | Conflito. O exercício já existe para este usuário.|
@@ -284,7 +290,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Resposta com os dados. |
 |  500 | Token inválido. |
 
@@ -299,7 +305,7 @@ Colar o token em Auth -> Bearer
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  204 | Exercício deletado com sucesso. |
 |  403 | O usuário não pode deletar esse exercício. |
 |  404 | Exercício não encontrado no banco de dados. |
@@ -368,7 +374,7 @@ JSON Response
 #### Foi implementado um Middleware, com o nome ValidateLimitStudentsToUser, para fazer o controle do limite de cadastro dos estudantes de acordo com o plano do usuário.
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  201 | Estudante criado com sucesso. |
 |  400 | Falha ao cadastrar. Dados inválidos. |
 |  403 | Não é possível cadastrar um novo estudante, pois atingiu o limite do plano.|
@@ -419,7 +425,7 @@ JSON Response
 #### Ao utilizar o Query Parameters é possui filtrar o resultado através do nome, CPF ou e-mail do estudante.
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Resposta com os dados. |
 |  500 | Token inválido. |
 
@@ -436,7 +442,7 @@ Colar o token em Auth -> Bearer
 #### Utiliza-se o Soft Delete para fazer a deleção do estudante.
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  204 | Estudante deletado com sucesso. |
 |  403 | O usuário não pode deletar esse estudante. |
 |  404 | O estudante não está cadastrado no banco de dados. |
@@ -495,7 +501,7 @@ JSON Response
 #### É possível atualizar todos ou apenas um campo do estudante.
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Estudante atualizado com sucesso. |
 |  404 | Falha em atualizar: O usuário não tem permissão ou o estudante não está cadastrado no banco de dados.|
 
@@ -546,7 +552,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  201 | Treino criado com sucesso. |
 |  409 | O treino já está cadastrado para este dia. |
 |  409 | O usuário não tem permissão para cadastrar um treino para esse aluno ou o exercício é inválido. |
@@ -622,7 +628,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Resposta com os dados. |
 |  403 | O usuário não tem permissão para visualizar essas informações. |
 |  401 | Não autenticado. |
@@ -655,7 +661,7 @@ JSON Response
 ```
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Resposta com os dados. |
 |  404 | O estudante não foi encontrado. |
 |  500 | Token inválido. |
@@ -672,13 +678,20 @@ Colar o token em Auth -> Bearer
 #### Ao utilizar a extensão vscode-pdf (autor: tomoki1207) será possível salvar ou visualizar o arquivo gerado.
 
 | Response Status       | Descrição                           |
-|  --------- | ---------------------------------- |
+|  :---: | ---------------------------------- |
 |  200 | Resposta com os dados. |
 |  403 | O usuário não tem permissão para visualizar essas informações. |
 |  500 | Token inválido. |
 
 <div align="center">
-<img src="public/" width="700px" alt="Print do arquivo em PDF" />
+<img src="public/TreinoEmPDF.png" width="700px" alt="Print do arquivo em PDF" />
 </div>
+
+##
+#### Projeto Avaliativo do Módulo 2 (Back-End) :: DEVinHouse - Zucchetti
+
+|    Autor    |  GitHub   |   WhatsApp  |
+|  :---: | :---:  | :---: |
+|  <img src="https://avatars.githubusercontent.com/u/135388215?s=400&u=a37d71f559365352e60211d8f88e41516c7e2e7d&v=4" width="60%" height="60%" alt="Foto do Autor Eduardo Rodrigues" /> | Eduardo Rodrigues :: [@EduardoPSRodrigues](https://github.com/EduardoPSRodrigues) | +55 (24) 99991-9295 |
 
 
